@@ -1,0 +1,29 @@
+meta {
+  name: Create position
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{api}}/api/positions
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  image: @file(/home/aleygues/Images/coding.jpg)
+  name: Une position
+  description: C'était un super endroit
+  lng: 4
+  lat: 4
+  author: John
+}
+
+body:file {
+  file: @file(/home/aleygues/Images/coding2.jpg) @contentType(image/jpeg)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

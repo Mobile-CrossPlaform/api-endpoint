@@ -1,0 +1,20 @@
+meta {
+  name: Get messages of channel
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{api}}/api/messages
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~channel: conversation-2
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
