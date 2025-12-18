@@ -2,12 +2,14 @@ import { Router } from "express";
 import { router as imagesRouter } from "./routes/Images";
 import { router as messagesRouter } from "./routes/Messages";
 import { router as positionsRouter } from "./routes/Positions";
+import { router as tagsRouter } from "./routes/Tags";
 
 export const router = Router();
 
 router.use("/api/images/", imagesRouter);
 router.use("/api/messages/", messagesRouter);
 router.use("/api/positions/", positionsRouter);
+router.use("/api/tags/", tagsRouter);
 
 router.get("/images/:path", (req, res) => {
   if (
