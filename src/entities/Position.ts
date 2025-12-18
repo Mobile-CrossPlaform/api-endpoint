@@ -33,8 +33,8 @@ export class Position extends BaseEntity {
   @Column({ nullable: true })
   author: string;
 
-  @Column({ nullable: true })
-  tag: string[];
+  @Column({ type: "simple-json", nullable: true })
+  tags: string[];
 
   @UpdateDateColumn()
   updatedAt: Date;
