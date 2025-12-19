@@ -13,16 +13,17 @@ const UPLOADS_DIR = path.join(DATA_DIR, "uploads");
 // Use relative path from project root since __dirname points to dist/ at runtime
 const SEED_IMAGES_DIR = "./src/assets/seed-images";
 
-// Target filenames matching Multer/router regex: yyyy-MM-dd_HH-mm-ss.ext
+// Original image filenames (alphabetical order when read from directory)
 const SEED_IMAGE_NAMES = [
-  "2025-01-01_10-00-00.jpg",
-  "2025-01-01_10-00-01.jpg",
-  "2025-01-01_10-00-02.jpg",
+  "Chinese_Traditional.jpg",
+  "French_FineDinning.jpg",
+  "Greece_Cuisine.jpg",
+  "Italian_Western.jpg",
 ];
 
 /**
  * Copies images from src/assets/seed-images/ to data/uploads/
- * Images in seed-images/ can have any name - they'll be renamed to match the expected format
+ * Keeps original filenames
  */
 function copySeedImages(): string[] {
   const copiedFiles: string[] = [];
@@ -33,29 +34,17 @@ function copySeedImages(): string[] {
     return copiedFiles;
   }
 
-  // Get all image files from the seed folder
-  const sourceFiles = fs.readdirSync(SEED_IMAGES_DIR).filter((file) => {
-    const ext = path.extname(file).toLowerCase();
-    return [".jpg", ".jpeg", ".png", ".gif", ".webp"].includes(ext);
-  });
+  // Copy each expected seed image
+  for (const filename of SEED_IMAGE_NAMES) {
+    const sourcePath = path.join(SEED_IMAGES_DIR, filename);
+    const targetPath = path.join(UPLOADS_DIR, filename);
 
-  if (sourceFiles.length === 0) {
-    console.log(`   ⚠️  No images found in ${SEED_IMAGES_DIR}`);
-    return copiedFiles;
-  }
-
-  // Copy each source file, renaming to match expected format
-  for (let i = 0; i < sourceFiles.length && i < SEED_IMAGE_NAMES.length; i++) {
-    const sourceFile = sourceFiles[i];
-    const sourceExt = path.extname(sourceFile).toLowerCase();
-    
-    // Use the predefined name but keep original extension
-    const targetName = SEED_IMAGE_NAMES[i].replace(/\.[^.]+$/, sourceExt);
-    const sourcePath = path.join(SEED_IMAGES_DIR, sourceFile);
-    const targetPath = path.join(UPLOADS_DIR, targetName);
-
-    fs.copyFileSync(sourcePath, targetPath);
-    copiedFiles.push(targetName);
+    if (fs.existsSync(sourcePath)) {
+      fs.copyFileSync(sourcePath, targetPath);
+      copiedFiles.push(filename);
+    } else {
+      console.log(`   ⚠️  Image not found: ${filename}`);
+    }
   }
 
   console.log(`   Copied ${copiedFiles.length} images from seed-images/`);
@@ -111,43 +100,55 @@ export async function seedDatabase(): Promise<void> {
   }
   console.log(`   Inserted ${tags.length} tags`);
 
-  // Seed Positions
+  // Seed Positions - Restaurants in Paris
   const positions = [
     {
-      name: "Eiffel Tower",
-      description: "Famous landmark in Paris",
-      lat: 48.8584,
-      lng: 2.2945,
+      name: "Le Dragon d'Or",
+      description: "Restaurant chinois traditionnel proposant des dim sum faits maison et des spécialités cantonaises dans un cadre authentique. Réputé pour son canard laqué et ses nouilles sautées.",
+      lat: 48.8720,
+      lng: 2.3650,
       author: "admin",
       ...(seedImages[0] && {
         imagePath: path.join(UPLOADS_DIR, seedImages[0]),
         imageUri: `/images/${seedImages[0]}`,
       }),
-      tags: ["landmark", "tourism"],
+      tags: ["chinese", "traditional", "dim-sum"],
     },
     {
-      name: "Central Park",
-      description: "Urban park in New York City",
-      lat: 40.7829,
-      lng: -73.9654,
+      name: "La Belle Époque",
+      description: "Restaurant gastronomique français offrant une cuisine raffinée dans un décor Belle Époque. Menu dégustation avec accords mets-vins et service impeccable.",
+      lat: 48.8650,
+      lng: 2.3280,
       author: "admin",
       ...(seedImages[1] && {
         imagePath: path.join(UPLOADS_DIR, seedImages[1]),
         imageUri: `/images/${seedImages[1]}`,
       }),
-      tags: ["park", "nature"],
+      tags: ["french", "fine-dining", "gastronomic"],
     },
     {
-      name: "Tokyo Station",
-      description: "Major railway station in Tokyo",
-      lat: 35.6812,
-      lng: 139.7671,
-      author: "user1",
+      name: "Ouzeria Athena",
+      description: "Taverne grecque conviviale servant des mezze, grillades et poissons frais. Ambiance méditerranéenne avec musique live le weekend et terrasse ensoleillée.",
+      lat: 48.8530,
+      lng: 2.3490,
+      author: "admin",
       ...(seedImages[2] && {
         imagePath: path.join(UPLOADS_DIR, seedImages[2]),
         imageUri: `/images/${seedImages[2]}`,
       }),
-      tags: ["transport", "architecture"],
+      tags: ["greek", "mediterranean", "seafood"],
+    },
+    {
+      name: "Trattoria da Luigi",
+      description: "Trattoria italienne familiale proposant des pâtes fraîches, pizzas au feu de bois et antipasti. Carte des vins italiens sélectionnés et tiramisu maison.",
+      lat: 48.8580,
+      lng: 2.3400,
+      author: "user1",
+      ...(seedImages[3] && {
+        imagePath: path.join(UPLOADS_DIR, seedImages[3]),
+        imageUri: `/images/${seedImages[3]}`,
+      }),
+      tags: ["italian", "pasta", "pizza"],
     },
   ];
 
@@ -158,35 +159,35 @@ export async function seedDatabase(): Promise<void> {
   }
   console.log(`   Inserted ${positions.length} positions`);
 
-  // Seed Messages
+  // Seed Messages - Restaurant-related
   const messages = [
     {
       channel: "general",
-      message: "Welcome to the app!",
+      message: "Bienvenue sur l'application de découverte de restaurants!",
       author: "admin",
       lat: 48.8566,
       lng: 2.3522,
     },
     {
       channel: "general",
-      message: "Hello everyone!",
+      message: "N'hésitez pas à partager vos découvertes culinaires!",
       author: "user1",
-      lat: 40.7128,
-      lng: -74.006,
+      lat: 48.8600,
+      lng: 2.3500,
     },
     {
-      channel: "support",
-      message: "How can I help you today?",
-      author: "support_bot",
+      channel: "recommendations",
+      message: "Le Dragon d'Or a les meilleurs dim sum de Paris!",
+      author: "foodie_paris",
+      lat: 48.8720,
+      lng: 2.3650,
     },
     {
-      channel: "announcements",
-      message: "New features coming soon!",
-      author: "admin",
-      ...(seedImages[2] && {
-        imagePath: path.join(UPLOADS_DIR, seedImages[2]),
-        imageUri: `/images/${seedImages[2]}`,
-      }),
+      channel: "recommendations",
+      message: "La Belle Époque vaut vraiment le détour pour une occasion spéciale.",
+      author: "gourmet_lover",
+      lat: 48.8650,
+      lng: 2.3280,
     },
   ];
 
@@ -197,39 +198,50 @@ export async function seedDatabase(): Promise<void> {
   }
   console.log(`   Inserted ${messages.length} messages`);
 
-  // Seed Images
+  // Seed Images - Restaurant photos
   const images = [
     {
-      name: "Sunset Photo",
-      description: "Beautiful sunset over the ocean",
-      lat: 34.0195,
-      lng: -118.4912,
-      author: "photographer1",
+      name: "Intérieur Le Dragon d'Or",
+      description: "Décoration traditionnelle chinoise avec lanternes rouges",
+      lat: 48.8720,
+      lng: 2.3650,
+      author: "admin",
       ...(seedImages[0] && {
         imagePath: path.join(UPLOADS_DIR, seedImages[0]),
         imageUri: `/images/${seedImages[0]}`,
       }),
     },
     {
-      name: "Mountain View",
-      description: "Snowy mountain peaks",
-      lat: 46.8523,
-      lng: 9.531,
-      author: "photographer2",
+      name: "Plat signature La Belle Époque",
+      description: "Foie gras poêlé aux figues et réduction de porto",
+      lat: 48.8650,
+      lng: 2.3280,
+      author: "admin",
       ...(seedImages[1] && {
         imagePath: path.join(UPLOADS_DIR, seedImages[1]),
         imageUri: `/images/${seedImages[1]}`,
       }),
     },
     {
-      name: "City Lights",
-      description: "Night cityscape with lights",
-      lat: 35.6762,
-      lng: 139.6503,
-      author: "photographer1",
+      name: "Mezze Ouzeria Athena",
+      description: "Assortiment de spécialités grecques: tzatziki, tarama, dolmas",
+      lat: 48.8530,
+      lng: 2.3490,
+      author: "foodie_paris",
       ...(seedImages[2] && {
         imagePath: path.join(UPLOADS_DIR, seedImages[2]),
         imageUri: `/images/${seedImages[2]}`,
+      }),
+    },
+    {
+      name: "Pizza Trattoria da Luigi",
+      description: "Pizza margherita au feu de bois avec mozzarella di bufala",
+      lat: 48.8580,
+      lng: 2.3400,
+      author: "gourmet_lover",
+      ...(seedImages[3] && {
+        imagePath: path.join(UPLOADS_DIR, seedImages[3]),
+        imageUri: `/images/${seedImages[3]}`,
       }),
     },
   ];

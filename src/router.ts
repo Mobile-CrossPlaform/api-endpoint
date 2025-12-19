@@ -12,8 +12,9 @@ router.use("/api/positions/", positionsRouter);
 router.use("/api/tags/", tagsRouter);
 
 router.get("/images/:path", (req, res) => {
+  // Accept: yyyy-MM-dd_HH-mm-ss.ext (Multer) OR AlphaNumeric_Name.ext (seed images)
   if (
-    /^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2}\.[a-z]{1,10}$/.test(
+    /^([0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2}|[A-Za-z0-9_]+)\.[a-z]{1,10}$/.test(
       req.params.path
     )
   ) {
