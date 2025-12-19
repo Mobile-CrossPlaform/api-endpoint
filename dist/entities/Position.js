@@ -27,11 +27,11 @@ __decorate([
     __metadata("design:type", String)
 ], Position.prototype, "description", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ type: "real", nullable: true }),
     __metadata("design:type", Number)
 ], Position.prototype, "lat", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ nullable: true }),
+    (0, typeorm_1.Column)({ type: "real", nullable: true }),
     __metadata("design:type", Number)
 ], Position.prototype, "lng", void 0);
 __decorate([
@@ -46,6 +46,10 @@ __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
 ], Position.prototype, "author", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: "simple-json", nullable: true }),
+    __metadata("design:type", Array)
+], Position.prototype, "tags", void 0);
 __decorate([
     (0, typeorm_1.UpdateDateColumn)(),
     __metadata("design:type", Date)

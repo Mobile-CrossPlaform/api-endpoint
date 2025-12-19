@@ -3,5 +3,7 @@ services:
     build: .
     ports:
       - 3000:3000
+    environment:
+      - MOCK_DATA=true
     volumes:
       - ./data:/app/data
